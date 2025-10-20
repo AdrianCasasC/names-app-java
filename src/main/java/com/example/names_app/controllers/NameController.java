@@ -1,8 +1,11 @@
 package com.example.names_app.controllers;
 
+import com.example.names_app.models.GroupedDto;
 import com.example.names_app.models.NameDto;
 import com.example.names_app.models.NameGroupDto;
+import com.example.names_app.models.PaginatedNamesDto;
 import com.example.names_app.services.NameService;
+import com.mongodb.lang.Nullable;
 import jakarta.websocket.server.PathParam;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,15 +23,13 @@ public class NameController {
     }
 
     @GetMapping
-    public List<NameDto> getAll() {
-        List<NameDto> names = service.getAll();
-        System.out.println("Names -> " +  names.getFirst().toString());
-        return names;
+    public ResponseEntity<PaginatedNamesDto> getAll(@Nullable @RequestParam String coincidence, @RequestParam int page, @RequestParam int pageSize) {
+        return ResponseEntity.ok(service.getAll(coincidence, page, pageSize));
     }
 
     @GetMapping("/grouped")
-    public ResponseEntity<List<NameGroupDto>> getGroupedNames(@RequestParam String filt) {
-        List<NameGroupDto> result = service.getNamesGroupedByFirstLetter(filt);
+    public ResponseEntity<List<NameGroupDto>> getGroupedNames(@Nullable @RequestParam String coincidence, @RequestParam int page, @RequestParam int pageSize) {
+        List<NameGroupDto> result = service.getNamesGroupedByFirstLetter(coincidence, page, pageSize);
         return ResponseEntity.ok(result);
     }
 

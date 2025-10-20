@@ -5,9 +5,9 @@ import lombok.Data;
 
 import java.util.List;
 
-@AllArgsConstructor
 @Data
-public class NameGroupDto {
-    private String letter;
-    private List<String> list;
+@AllArgsConstructor
+public class GroupedDto {
+    public String letter;
+    public List<NameDto> list;
 }

@@ -1,7 +1,7 @@
 package com.example.names_app.models;
 
 import lombok.Data;
-import org.springframework.data.annotation.Id;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
@@ -9,10 +9,10 @@ import java.time.LocalDate;
 @Data
 @Document(collection = "names")
 public class NameDto {
-    @Id
     private String _id;
     private String name;
-    private LocalDate dateOfMeet;
+    private LocalDate date;
     private Boolean checked;
+    private String meaning;
     private String details;
 }
