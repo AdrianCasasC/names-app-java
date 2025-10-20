@@ -5,10 +5,7 @@ import com.example.names_app.models.NameGroupDto;
 import com.example.names_app.services.NameService;
 import jakarta.websocket.server.PathParam;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,8 +27,8 @@ public class NameController {
     }
 
     @GetMapping("/grouped")
-    public ResponseEntity<List<NameGroupDto>> getGroupedNames() {
-        List<NameGroupDto> result = service.getNamesGroupedByFirstLetter();
+    public ResponseEntity<List<NameGroupDto>> getGroupedNames(@RequestParam String filt) {
+        List<NameGroupDto> result = service.getNamesGroupedByFirstLetter(filt);
         return ResponseEntity.ok(result);
     }
 

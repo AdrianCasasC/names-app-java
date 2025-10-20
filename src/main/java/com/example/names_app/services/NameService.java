@@ -35,18 +35,27 @@ public class NameService {
         return names;
     }
 
-    public List<NameGroupDto> getNamesGroupedByFirstLetter() {
+    public List<NameGroupDto> getNamesGroupedByFirstLetter(String filter) {
         MongoDatabase database = mongoClient.getDatabase(mongoDbName);
         MongoCollection<Document> collection = database.getCollection("names");
 
         List<NameGroupDto> groupedNames = new ArrayList<>();
 
-        var pipeline = of(
-                new Document("$group", new Document("_id",
-                        new Document("$toUpper", new Document("$substrCP", of("$name", 0, 1))))
-                        .append("names", new Document("$push", "$name"))),
-                new Document("$sort", new Document("_id", 1))
-        );
+        List<Document> pipeline = new ArrayList<>();
+
+        // Stage 1: Filter by 'filter' string if it's not null or empty
+        if (filter != null && !filter.isEmpty()) {
+            pipeline.add(new Document("$match",
+                    new Document("name", new Document("$regex", filter).append("$options", "i"))));
+        }
+
+        // Stage 2: Group by first letter
+        pipeline.add(new Document("$group", new Document("_id",
+                new Document("$toUpper", new Document("$substrCP", of("$name", 0, 1))))
+                .append("names", new Document("$push", "$name"))));
+
+        // Stage 3: Sort by letter
+        pipeline.add(new Document("$sort", new Document("_id", 1)));
 
         for (Document doc : collection.aggregate(pipeline)) {
             String letter = doc.getString("_id");
