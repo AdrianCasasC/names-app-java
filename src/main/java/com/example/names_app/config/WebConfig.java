@@ -15,7 +15,7 @@ public class WebConfig {
                 registry.addMapping("/**") // allow all endpoints
                         .allowedOrigins(
                                 "http://localhost:4200",
-                                "https://stay-strong-front.netlify.app"
+                                "https://names-checker.netlify.app/"
                         )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
