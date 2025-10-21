@@ -1,5 +1,6 @@
 package com.example.names_app.services;
 
+import com.example.names_app.constants.Identity;
 import com.example.names_app.models.GroupedDto;
 import com.example.names_app.models.NameDto;
 import com.example.names_app.models.NameGroupDto;
@@ -31,23 +32,27 @@ import static java.util.List.of;
 public class NameService {
     private final NamesRepositoryInterface repository;
     private final MongoClient mongoClient;
+    private final PunctuationService punctuationService;
     @Autowired
     private MongoTemplate mongoTemplate;
 
     @Value("${MONGO_DB_NAME}")
     private String mongoDbName;
+    @Value("${MONGO_NAMES_COLL}")
+    private String mongoNamesCollection;
 
     //@Value("${MONGO_COLL_NAME}")
     //private String mongoCollName;
 
-    public NameService(NamesRepositoryInterface repository, MongoClient mongoClient) {
+    public NameService(NamesRepositoryInterface repository, MongoClient mongoClient, PunctuationService punctuationService) {
         this.repository = repository;
         this.mongoClient = mongoClient;
+        this.punctuationService = punctuationService;
     }
 
     public PaginatedNamesDto getAll(String coincidence, int page, int pageSize) {
         MongoDatabase database = mongoClient.getDatabase(mongoDbName);
-        MongoCollection<Document> collection = database.getCollection("names");
+        MongoCollection<Document> collection = database.getCollection(mongoNamesCollection);
 
         if (page < 1) page = 1;
         int skip = (page - 1) * pageSize;
@@ -158,12 +163,21 @@ public class NameService {
         // Only add fields that are NOT null
         if (dto.getName() != null) update.set("name", dto.getName());
         if (dto.getDate() != null) update.set("date", dto.getDate());
-        if (dto.getCheckedByAdri() != null) update.set("checkedByAdri", dto.getCheckedByAdri());
-        if (dto.getCheckedByElena() != null) update.set("checkedByElena", dto.getCheckedByElena());
+        if (dto.getCheckedByAdri() != null) {
+            update.set("checkedByAdri", dto.getCheckedByAdri());
+            punctuationService.setPunctuation(Identity.ADRIAN, dto.getName(), dto.getCheckedByAdri());
+        }
+
+        if (dto.getCheckedByElena() != null) {
+            update.set("checkedByElena", dto.getCheckedByElena());
+            punctuationService.setPunctuation(Identity.ELENA, dto.getName(), dto.getCheckedByElena());
+        }
         if (dto.getMeaning() != null) update.set("meaning", dto.getMeaning());
         if (dto.getDetails() != null) update.set("details", dto.getDetails());
 
         mongoTemplate.updateFirst(query, update, NameDto.class);
+
+
         return repository.findById(id);
     }
 }
