@@ -78,7 +78,8 @@ public class NameService {
                 p.setDate(((Date) dateObj).toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
             }
 
-            p.setChecked(d.getBoolean("checked", false));
+            p.setCheckedByAdri(d.getBoolean("checkedByAdri", false));
+            p.setCheckedByElena(d.getBoolean("checkedByElena", false));
             p.setMeaning(d.getString("meaning"));
             p.setDetails(d.getString("details"));
 

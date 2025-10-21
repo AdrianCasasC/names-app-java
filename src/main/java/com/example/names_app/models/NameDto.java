@@ -12,7 +12,8 @@ public class NameDto {
     private String _id;
     private String name;
     private LocalDate date;
-    private Boolean checked;
+    private Boolean checkedByAdri;
+    private Boolean checkedByElena;
     private String meaning;
     private String details;
 }
