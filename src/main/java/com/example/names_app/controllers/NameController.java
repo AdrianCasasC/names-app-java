@@ -10,7 +10,9 @@ import jakarta.websocket.server.PathParam;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.naming.Name;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/names")
@@ -36,5 +38,11 @@ public class NameController {
     @GetMapping("/{name}")
     public ResponseEntity<NameDto> getByName(@PathVariable String name) {
         return ResponseEntity.ok(service.getByName(name));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<NameDto> updateById(@PathVariable String id, @RequestBody NameDto body) {
+        Optional<NameDto> updatedName = service.updateById(id, body);
+        return updatedName.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

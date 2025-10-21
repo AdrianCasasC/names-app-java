@@ -13,7 +13,12 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Sorts;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneId;
@@ -26,6 +31,8 @@ import static java.util.List.of;
 public class NameService {
     private final NamesRepositoryInterface repository;
     private final MongoClient mongoClient;
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     @Value("${MONGO_DB_NAME}")
     private String mongoDbName;
@@ -139,7 +146,23 @@ public class NameService {
     }
 
     public NameDto getByName(String name) {
-        NameDto foundName = repository.findByName(name);
-        return foundName;
+        return repository.findByName(name);
+    }
+
+    public Optional<NameDto> updateById(String id, NameDto dto) {
+        repository.findById(id).orElseThrow();
+        Query query = new Query(Criteria.where("_id").is(id));
+        Update update = new Update();
+
+        // Only add fields that are NOT null
+        if (dto.getName() != null) update.set("name", dto.getName());
+        if (dto.getDate() != null) update.set("date", dto.getDate());
+        if (dto.getCheckedByAdri() != null) update.set("checkedByAdri", dto.getCheckedByAdri());
+        if (dto.getCheckedByElena() != null) update.set("checkedByElena", dto.getCheckedByElena());
+        if (dto.getMeaning() != null) update.set("meaning", dto.getMeaning());
+        if (dto.getDetails() != null) update.set("details", dto.getDetails());
+
+        mongoTemplate.updateFirst(query, update, NameDto.class);
+        return repository.findById(id);
     }
 }
