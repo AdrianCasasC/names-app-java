@@ -150,7 +150,8 @@ public class NameService {
     }
 
     public Optional<NameDto> updateById(String id, NameDto dto) {
-        repository.findById(id).orElseThrow();
+        Optional<NameDto> nameToUpdate = repository.findById(id);
+        if (nameToUpdate.isEmpty()) return Optional.empty();
         Query query = new Query(Criteria.where("_id").is(id));
         Update update = new Update();
 
