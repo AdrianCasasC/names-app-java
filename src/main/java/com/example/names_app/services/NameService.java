@@ -180,4 +180,8 @@ public class NameService {
 
         return repository.findById(id);
     }
+
+    public NameDto addName(NameDto newName) {
+        return repository.save(newName);
+    }
 }
