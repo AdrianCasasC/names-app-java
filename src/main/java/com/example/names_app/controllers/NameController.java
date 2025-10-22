@@ -45,4 +45,9 @@ public class NameController {
         Optional<NameDto> updatedName = service.updateById(id, body);
         return updatedName.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    @PostMapping
+    public ResponseEntity<NameDto> addName(@RequestBody NameDto body) {
+        return ResponseEntity.ok(service.addName(body));
+    }
 }
