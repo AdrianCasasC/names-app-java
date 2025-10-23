@@ -20,6 +20,8 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneId;
@@ -183,5 +185,25 @@ public class NameService {
 
     public NameDto addName(NameDto newName) {
         return repository.save(newName);
+    }
+
+
+    public ResponseEntity<?> deleteNameById(String id) {
+        try {
+            // Check if document exists first
+            if (!repository.existsById(id)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "Name not found"));
+            }
+
+            // Delete and return success
+            repository.deleteById(id);
+            return ResponseEntity.ok(Map.of("message", "Name deleted successfully"));
+
+        } catch (Exception e) {
+            // Catch any MongoDB or data access errors
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to delete name", "details", e.getMessage()));
+        }
     }
 }
