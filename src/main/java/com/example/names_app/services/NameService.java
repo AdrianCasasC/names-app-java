@@ -20,6 +20,8 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneId;
@@ -155,7 +157,7 @@ public class NameService {
     }
 
     public Optional<NameDto> updateById(String id, NameDto dto) {
-        Optional<NameDto> nameToUpdate = repository.findById(id);
+        Optional<NameDto> nameToUpdate = repository.findById(new ObjectId(id));
         if (nameToUpdate.isEmpty()) return Optional.empty();
         Query query = new Query(Criteria.where("_id").is(id));
         Update update = new Update();
@@ -178,10 +180,30 @@ public class NameService {
         mongoTemplate.updateFirst(query, update, NameDto.class);
 
 
-        return repository.findById(id);
+        return repository.findById(new ObjectId(id));
     }
 
     public NameDto addName(NameDto newName) {
         return repository.save(newName);
+    }
+
+
+    public ResponseEntity<?> deleteNameById(String id) {
+        try {
+            // Check if document exists first
+            if (!repository.existsById(new ObjectId(id))) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "Name not found"));
+            }
+
+            // Delete and return success
+            repository.deleteById(new ObjectId(id));
+            return ResponseEntity.ok(Map.of("message", "Name deleted successfully"));
+
+        } catch (Exception e) {
+            // Catch any MongoDB or data access errors
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to delete name", "details", e.getMessage()));
+        }
     }
 }

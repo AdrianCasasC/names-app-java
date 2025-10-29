@@ -50,4 +50,9 @@ public class NameController {
     public ResponseEntity<NameDto> addName(@RequestBody NameDto body) {
         return ResponseEntity.ok(service.addName(body));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteName(@PathVariable String id) {
+        return service.deleteNameById(id);
+    }
 }
