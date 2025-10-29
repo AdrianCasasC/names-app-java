@@ -157,7 +157,7 @@ public class NameService {
     }
 
     public Optional<NameDto> updateById(String id, NameDto dto) {
-        Optional<NameDto> nameToUpdate = repository.findById(id);
+        Optional<NameDto> nameToUpdate = repository.findById(new ObjectId(id));
         if (nameToUpdate.isEmpty()) return Optional.empty();
         Query query = new Query(Criteria.where("_id").is(id));
         Update update = new Update();
@@ -180,7 +180,7 @@ public class NameService {
         mongoTemplate.updateFirst(query, update, NameDto.class);
 
 
-        return repository.findById(id);
+        return repository.findById(new ObjectId(id));
     }
 
     public NameDto addName(NameDto newName) {
@@ -191,13 +191,13 @@ public class NameService {
     public ResponseEntity<?> deleteNameById(String id) {
         try {
             // Check if document exists first
-            if (!repository.existsById(id)) {
+            if (!repository.existsById(new ObjectId(id))) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Map.of("error", "Name not found"));
             }
 
             // Delete and return success
-            repository.deleteById(id);
+            repository.deleteById(new ObjectId(id));
             return ResponseEntity.ok(Map.of("message", "Name deleted successfully"));
 
         } catch (Exception e) {
